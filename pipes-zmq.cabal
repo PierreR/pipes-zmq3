@@ -1,0 +1,42 @@
+Name: pipes-zmq
+Version: 1.0.0
+Cabal-Version: >=1.8
+Build-Type: Simple
+License: BSD3
+License-File: LICENSE
+Copyright: 2013 Pierre Radermecker
+Author: Pierre Radermecker
+Maintainer: PierreR@pi3r.com
+Bug-Reports: https://github.com/PierreR/zpipes
+Tested-With: GHC == 7.6.3
+Synopsis: Pipes/ZMQ bridge
+Description: 
+Category: System, Pipes
+Source-Repository head
+    Type: git
+    Location: https://github.com/PierreR/zpipes
+
+Library
+    Hs-Source-Dirs: src
+    Build-Depends:
+        base             >= 4.3     && < 5,
+        bytestring       >= 0.10    && < 0.11,
+        pipes            >= 4.0     && < 4.1,
+        pipes-bytestring >= 1.0     && < 2.0,
+        zeromq3-haskell >= 0.5     && < 0.6
+    Exposed-Modules: Pipes.Zpipes
+    GHC-Options: -O2
+
+executable playground
+  default-language: Haskell2010
+  main-is:  playground.hs
+  build-depends:   base >= 4,
+                   zeromq3-haskell  >= 0.5,
+                   pipes            >= 4.0     && < 4.1,
+                   pipes-bytestring >= 1.0     && < 2.0,
+                   pipes-zmq        >= 1.0     && < 2.0,
+                   bytestring,
+                   transformers,
+                   utf8-string
+
+  ghc-options:     -Wall -threaded
