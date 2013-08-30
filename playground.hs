@@ -3,7 +3,7 @@ where
 
 import Pipes
 import qualified Pipes.ByteString as PB
-import qualified Pipes.ZMQ as PZ
+import qualified Pipes.ZMQ3 as PZ
 import qualified System.ZMQ3 as Z
 
 import Control.Concurrent (threadDelay, forkIO)

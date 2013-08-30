@@ -1,4 +1,4 @@
-module Pipes.ZMQ
+module Pipes.ZMQ3
 where
 
 import qualified Data.ByteString as B
