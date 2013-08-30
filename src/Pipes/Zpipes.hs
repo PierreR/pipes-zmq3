@@ -4,7 +4,6 @@ where
 import qualified Data.ByteString as B
 
 import Pipes
-import Pipes.ByteString as PB
 import qualified System.ZMQ3 as Z
 
 
