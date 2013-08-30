@@ -24,7 +24,7 @@ Library
         pipes            >= 4.0     && < 4.1,
         pipes-bytestring >= 1.0     && < 2.0,
         zeromq3-haskell >= 0.5     && < 0.6
-    Exposed-Modules: Pipes.Zpipes
+    Exposed-Modules: Pipes.ZMQ
     GHC-Options: -O2
 
 executable playground
