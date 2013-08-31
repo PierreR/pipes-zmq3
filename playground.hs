@@ -29,5 +29,5 @@ main = do
                 msg <- Z.receive s
                 -- Simulate doing some 'work' for 1 second
                 threadDelay (10^6)
-                --Z.send s [] msg
+                Z.send s [] msg
 

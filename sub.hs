@@ -6,7 +6,6 @@ import qualified Pipes.Prelude as P
 import qualified Pipes.ZMQ3 as PZ
 import qualified System.ZMQ3 as Z
 
-import Control.Concurrent (threadDelay)
 import Control.Concurrent.Async
 import Control.Monad (forever)
 import Data.ByteString.Char8 (pack, unpack)
@@ -29,10 +28,9 @@ main = do
             runEffect $ PZ.fromSub subSocket >-> P.map (display.words.unpack) >->  P.stdout
     where
         
-        pubServer s = forever $ do
-            --threadDelay (10) 
+        pubServer s = forever $ do 
             zipcode <- randomRIO (0::Int, 100000)
-            temperature <- randomRIO (-80::Int, 135)
+            temperature <- randomRIO (-10::Int, 35)
             humidity <- randomRIO (10::Int, 60)
             let update = pack $ unwords [show zipcode, show temperature, show humidity]
             Z.send s [] update

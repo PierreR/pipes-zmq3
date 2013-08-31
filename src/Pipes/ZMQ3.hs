@@ -8,14 +8,16 @@ import qualified System.ZMQ3 as Z
 import Control.Monad (forever)
 
 
-{-| Send some bytes over ZMQ, and 
-    wait for the reply
+{-| Send upstream bytes into a request socket, 
+    wait/block for the reply,
+    yield the reply
 -}
-request :: (Z.Sender t, Z.Receiver t) => Z.Socket t -> Pipe B.ByteString B.ByteString IO ()
+request :: Z.Socket Z.Req -> Pipe B.ByteString B.ByteString IO ()
 request sock = forever $ do
-    await >>= lift . Z.send sock []
-    (lift $ Z.receive sock) >>= yield
+    await >>= liftIO . Z.send sock []
+    (liftIO $ Z.receive sock) >>= yield
 
-fromSub :: (Z.Receiver t) => Z.Socket t -> Producer B.ByteString IO ()
+-- | Use a Subscription Socket to produce 'ByteString's
+fromSub :: Z.Socket Z.Sub -> Producer B.ByteString IO ()
 fromSub sock  = forever $ do
-	(lift $ Z.receive sock) >>= yield
+	(liftIO $ Z.receive sock) >>= yield
