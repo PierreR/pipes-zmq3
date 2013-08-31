@@ -6,11 +6,11 @@ import qualified Pipes.Prelude as P
 import qualified Pipes.ZMQ3 as PZ
 import qualified System.ZMQ3 as Z
 
-import Control.Concurrent (forkIO, threadDelay)
+import Control.Concurrent (threadDelay)
+import Control.Concurrent.Async
 import Control.Monad (forever)
 import Data.ByteString.Char8 (pack, unpack)
 import System.Random (randomRIO)
-
 
 
 main :: IO ()
@@ -22,7 +22,7 @@ main = do
             
             Z.bind pubSocket "inproc://pubserver"
             putStrLn "Starting pub server"
-            forkIO $ pubServer pubSocket
+            async $ pubServer pubSocket
 
             Z.connect subSocket "inproc://pubserver"
             Z.subscribe subSocket (pack "10001")
