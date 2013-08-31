@@ -6,6 +6,7 @@ import qualified Pipes.Prelude as P
 import qualified Pipes.ZMQ3 as PZ
 import qualified System.ZMQ3 as Z
 
+import Control.Concurrent(threadDelay)
 import Control.Concurrent.Async
 import Control.Monad (forever)
 import Data.ByteString.Char8 (pack, unpack)
@@ -22,14 +23,14 @@ main = do
             Z.bind pubSocket "inproc://pubserver"
             putStrLn "Starting pub server"
             async $ pubServer pubSocket
-
             Z.connect subSocket "inproc://pubserver"
             Z.subscribe subSocket (pack "10001")
             runEffect $ PZ.fromSub subSocket >-> P.map (display.words.unpack) >->  P.stdout
     where
         
-        pubServer s = forever $ do 
-            zipcode <- randomRIO (0::Int, 100000)
+        pubServer s = forever $ do
+            threadDelay (29) -- be gentle with the CPU
+            zipcode <- randomRIO (10000::Int, 19900) -- be gentle with the CPU
             temperature <- randomRIO (-10::Int, 35)
             humidity <- randomRIO (10::Int, 60)
             let update = pack $ unwords [show zipcode, show temperature, show humidity]
@@ -37,4 +38,4 @@ main = do
         
         display:: [String] -> String
         display [_, temp, hum] =
-            unwords ["New York", "Temperature:" , temp, "Humidity:" , hum] 
+            unwords ["NY City", "Temperature:" , temp, "Humidity:" , hum] 
