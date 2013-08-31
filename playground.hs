@@ -16,7 +16,7 @@ main = do
         Z.withSocket ctx Z.Rep $ \echoServer ->
         Z.withSocket ctx Z.Req $ \client -> do
             
-            Z.bind echoServer "inproc://server"
+            Z.bind echoServer "inproc://echoserver"
             putStrLn "Started echo server"
             forkIO $ echo echoServer
 
@@ -29,5 +29,5 @@ main = do
                 msg <- Z.receive s
                 -- Simulate doing some 'work' for 1 second
                 threadDelay (10^6)
-                Z.send s [] msg
+                --Z.send s [] msg
 
