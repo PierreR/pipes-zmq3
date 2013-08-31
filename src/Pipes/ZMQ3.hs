@@ -12,12 +12,12 @@ import Control.Monad (forever)
     wait/block for the reply,
     yield the reply
 -}
-request :: Z.Socket Z.Req -> Pipe B.ByteString B.ByteString IO ()
+request :: MonadIO m => Z.Socket Z.Req -> Pipe B.ByteString B.ByteString m ()
 request sock = forever $ do
     await >>= liftIO . Z.send sock []
     (liftIO $ Z.receive sock) >>= yield
 
 -- | Use a Subscription Socket to produce 'ByteString's
-fromSub :: Z.Socket Z.Sub -> Producer B.ByteString IO ()
+fromSub :: MonadIO m => Z.Socket Z.Sub -> Producer B.ByteString m ()
 fromSub sock  = forever $ do
 	(liftIO $ Z.receive sock) >>= yield
