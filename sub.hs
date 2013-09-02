@@ -17,7 +17,7 @@ import System.Random (randomRIO)
 
 pubServerThread :: Z.Sender t => Z.Socket t -> IO r
 pubServerThread s = forever $ do
-    threadDelay (28) -- be gentle with the CPU
+    threadDelay (25) -- be gentle with the CPU
     zipcode <- randomRIO (10000::Int, 11000)
     temperature <- randomRIO (-10::Int, 35)
     humidity <- randomRIO (10::Int, 60)
@@ -37,27 +37,24 @@ main = do
 
             Z.connect subSocket "inproc://pubserver"
             Z.subscribe subSocket (pack "10001")
-            
+
             evalStateT loop (processedData subSocket)
     where 
 
         loop :: StateT (Producer (Int, Int, Int) IO  r) IO ()
         loop = do
-            temp <- P.sum (input >-> P.take 10 >-> P.map (\(_, t, _) -> t))
-            lift $ printf "-- Report: sum temp is %d --" temp
+            sumTemp <- P.sum (input >-> P.take 10 >-> P.map (\(_, t, _) -> t))
+            liftIO $ printf "-- Report: sum temp is %d \n" sumTemp    
             eof <- isEndOfInput
             unless eof loop
 
         processedData :: Z.Socket Z.Sub -> Producer (Int, Int, Int) IO ()
         processedData subSocket = for (PZ.fromSub subSocket) $ \bs -> do
-            let ws = words (unpack bs)
-            liftIO $ putStrLn (display ws)
-            let [zipcode, temperature, humidity] = map read ws
+            let [zipcode, temperature, humidity] = map read $ words (unpack bs)
+            liftIO $ printf "At NY City (%d), temperature of %d and humidity %d\n"  zipcode temperature humidity          
             yield (zipcode, temperature, humidity)
 
-        display:: [String] -> String
-        display [_, temp, hum] =
-            unwords ["NY City", "Temperature:" , temp, "Humidity:" , hum]
+            
 
 
 
