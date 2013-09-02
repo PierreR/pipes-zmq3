@@ -15,6 +15,15 @@ import Data.ByteString.Char8 (pack, unpack)
 import Text.Printf
 import System.Random (randomRIO)
 
+pubServerThread :: Z.Sender t => Z.Socket t -> IO r
+pubServerThread s = forever $ do
+    threadDelay (28) -- be gentle with the CPU
+    zipcode <- randomRIO (10000::Int, 11000)
+    temperature <- randomRIO (-10::Int, 35)
+    humidity <- randomRIO (10::Int, 60)
+    let update = pack $ unwords [show zipcode, show temperature, show humidity]
+    Z.send s [] update
+
 main :: IO ()
 main = do
     -- create and use exactly one context in a single process
@@ -24,9 +33,11 @@ main = do
             
             Z.bind pubSocket "inproc://pubserver"
             putStrLn "Starting pub server"
-            async $ pubServer pubSocket
+            async $ pubServerThread pubSocket
+
             Z.connect subSocket "inproc://pubserver"
             Z.subscribe subSocket (pack "10001")
+            
             evalStateT loop (processedData subSocket)
     where 
 
@@ -37,14 +48,6 @@ main = do
             eof <- isEndOfInput
             unless eof loop
 
-        pubServer s = forever $ do
-            threadDelay (28) -- be gentle with the CPU
-            zipcode <- randomRIO (10000::Int, 11000)
-            temperature <- randomRIO (-10::Int, 35)
-            humidity <- randomRIO (10::Int, 60)
-            let update = pack $ unwords [show zipcode, show temperature, show humidity]
-            Z.send s [] update
-        
         processedData :: Z.Socket Z.Sub -> Producer (Int, Int, Int) IO ()
         processedData subSocket = for (PZ.fromSub subSocket) $ \bs -> do
             let ws = words (unpack bs)
