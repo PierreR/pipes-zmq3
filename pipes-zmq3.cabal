@@ -34,6 +34,7 @@ executable sub
   build-depends:  async >= 2,
                   base >= 4,
                   bytestring,
+                  foldl            >= 1.0     && < 1.1,
                   pipes            >= 4.0     && < 4.1,
                   pipes-bytestring >= 1.0     && < 2.0,
                   --pipes-concurrency >= 2.0     && < 2.1,

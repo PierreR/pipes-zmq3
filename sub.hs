@@ -10,6 +10,9 @@ import qualified System.ZMQ3 as Z
 import Control.Concurrent(threadDelay)
 import Control.Concurrent.Async
 import Control.Monad (forever, unless)
+import Control.Applicative((<$>), (<*>))
+
+import qualified Control.Foldl as Left
 
 import Data.ByteString.Char8 (pack, unpack)
 import Text.Printf
@@ -23,6 +26,10 @@ pubServerThread s = forever $ do
     humidity <- randomRIO (10::Int, 60)
     let update = pack $ unwords [show zipcode, show temperature, show humidity]
     Z.send s [] update
+
+fold' :: (Monad m )=> Left.Fold a b -> Producer a m () -> m b
+fold' myFold = case myFold of
+    Left.Fold step begin done -> P.fold step begin done
 
 main :: IO ()
 main = do
@@ -45,8 +52,8 @@ main = do
         reporter = loop
             where 
                 loop = do
-                    sumTemp <- P.sum (input >-> P.take 10 >-> P.map (\(_, t, _) -> t))
-                    liftIO $ printf "-- Report: sum temp is %d \n" sumTemp    
+                    avgTemp <- fold' (div <$> Left.sum <*> Left.length) (input >-> P.take 10 >-> P.map (\(_, t, _) -> t))
+                    liftIO $ printf "-- Report: average temperature is %d \n" avgTemp    
                     eof <- isEndOfInput
                     unless eof loop
 
