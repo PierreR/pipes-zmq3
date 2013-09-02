@@ -38,15 +38,17 @@ main = do
             Z.connect subSocket "inproc://pubserver"
             Z.subscribe subSocket (pack "10001")
 
-            evalStateT loop (processedData subSocket)
+            evalStateT reporter (processedData subSocket)
     where 
 
-        loop :: StateT (Producer (Int, Int, Int) IO  r) IO ()
-        loop = do
-            sumTemp <- P.sum (input >-> P.take 10 >-> P.map (\(_, t, _) -> t))
-            liftIO $ printf "-- Report: sum temp is %d \n" sumTemp    
-            eof <- isEndOfInput
-            unless eof loop
+        reporter :: StateT (Producer (Int, Int, Int) IO  r) IO ()
+        reporter = loop
+            where 
+                loop = do
+                    sumTemp <- P.sum (input >-> P.take 10 >-> P.map (\(_, t, _) -> t))
+                    liftIO $ printf "-- Report: sum temp is %d \n" sumTemp    
+                    eof <- isEndOfInput
+                    unless eof loop
 
         processedData :: Z.Socket Z.Sub -> Producer (Int, Int, Int) IO ()
         processedData subSocket = for (PZ.fromSub subSocket) $ \bs -> do
