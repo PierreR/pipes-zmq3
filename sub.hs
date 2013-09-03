@@ -31,6 +31,17 @@ fold' :: (Monad m )=> Left.Fold a b -> Producer a m () -> m b
 fold' myFold = case myFold of
     Left.Fold step begin done -> P.fold step begin done
 
+-- | This function will be part of foldl later on
+--   @fold (mapped f folder) list == fold folder (map f list)@
+mapped :: (a -> b) -> Left.Fold b r -> Left.Fold a r
+mapped f (Left.Fold step begin done) = Left.Fold step' begin done
+  where
+    step' x = step x . f
+
+average :: Left.Fold Int Int
+average = div <$> Left.sum <*> Left.length
+
+
 main :: IO ()
 main = do
     -- create and use exactly one context in a single process
@@ -52,10 +63,20 @@ main = do
         reporter = loop
             where 
                 loop = do
-                    avgTemp <- fold' (div <$> Left.sum <*> Left.length) (input >-> P.take 10 >-> P.map (\(_, t, _) -> t))
-                    liftIO $ printf "-- Report: average temperature is %d \n" avgTemp    
+                    (avgTemp, avgHum) <- fold' averages (input >-> P.take 10)
+                    liftIO $ printf "-- Report: average temperature is %d°C, average humidity is %d%% \n" avgTemp avgHum   
                     eof <- isEndOfInput
                     unless eof loop
+
+        averages :: Left.Fold (Int, Int, Int) (Int, Int)
+        averages =
+            let avgTemp :: Left.Fold (Int, Int, Int) Int
+                avgTemp = mapped (\(_, t, _) -> t) average
+
+                avgHumidity :: Left.Fold (Int, Int, Int) Int
+                avgHumidity = mapped (\(_, _, h) -> h) average
+
+            in  (,) <$> avgTemp <*> avgHumidity
 
         processedData :: Z.Socket Z.Sub -> Producer (Int, Int, Int) IO ()
         processedData subSocket = for (PZ.fromSub subSocket) $ \bs -> do
