@@ -12,7 +12,7 @@ import Control.Concurrent.Async
 import Control.Monad (forever, unless)
 import Control.Applicative((<$>), (<*>))
 
-import qualified Control.Foldl as Left
+import qualified Control.Foldl as L
 
 import Data.ByteString.Char8 (pack, unpack)
 import Text.Printf
@@ -27,19 +27,19 @@ pubServerThread s = forever $ do
     let update = pack $ unwords [show zipcode, show temperature, show humidity]
     Z.send s [] update
 
-fold' :: (Monad m )=> Left.Fold a b -> Producer a m () -> m b
+fold' :: (Monad m )=> L.Fold a b -> Producer a m () -> m b
 fold' myFold = case myFold of
-    Left.Fold step begin done -> P.fold step begin done
+    L.Fold step begin done -> P.fold step begin done
 
 -- | This function will be part of foldl later on
 --   @fold (mapped f folder) list == fold folder (map f list)@
-mapped :: (a -> b) -> Left.Fold b r -> Left.Fold a r
-mapped f (Left.Fold step begin done) = Left.Fold step' begin done
+mapped :: (a -> b) -> L.Fold b r -> L.Fold a r
+mapped f (L.Fold step begin done) = L.Fold step' begin done
   where
     step' x = step x . f
 
-average :: Left.Fold Int Int
-average = div <$> Left.sum <*> Left.length
+average :: L.Fold Int Int
+average = div <$> L.sum <*> L.length
 
 
 main :: IO ()
@@ -68,12 +68,12 @@ main = do
                     eof <- isEndOfInput
                     unless eof loop
 
-        averages :: Left.Fold (Int, Int, Int) (Int, Int)
+        averages :: L.Fold (Int, Int, Int) (Int, Int)
         averages =
-            let avgTemp :: Left.Fold (Int, Int, Int) Int
+            let avgTemp :: L.Fold (Int, Int, Int) Int
                 avgTemp = mapped (\(_, t, _) -> t) average
 
-                avgHumidity :: Left.Fold (Int, Int, Int) Int
+                avgHumidity :: L.Fold (Int, Int, Int) Int
                 avgHumidity = mapped (\(_, _, h) -> h) average
 
             in  (,) <$> avgTemp <*> avgHumidity
