@@ -17,10 +17,10 @@ main = do
         Z.withSocket ctx Z.Req $ \client -> do
             
             Z.bind echoServer "inproc://echoserver"
-            putStrLn "Started echo server"
             forkIO $ echo echoServer
+            putStrLn "Started echo server"
 
-            Z.connect client "inproc://server"
+            Z.connect client "inproc://echoserver"
             putStrLn "The client will send stdout to the echoserver and print it back"
             runEffect $ PB.stdin >-> PZ.request client >-> PB.stdout
     where
@@ -28,6 +28,6 @@ main = do
             forever $ do
                 msg <- Z.receive s
                 -- Simulate doing some 'work' for 1 second
-                threadDelay (10^6)
+                threadDelay (1000000)
                 Z.send s [] msg
 

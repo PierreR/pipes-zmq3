@@ -1,7 +1,8 @@
 {-# LANGUAGE RankNTypes #-}
 
 module Pipes.ZMQ3 (
-	fromZMQ
+	fromZMQ,
+    request
     ) where
 
 import qualified Data.ByteString as B
@@ -12,15 +13,15 @@ import Control.Monad (forever)
 
 
 {-| Send upstream bytes into a request socket, 
-    wait/block for the reply,
-    yield the reply
+    wait/block and yield the reply
 -}
 request :: MonadIO m => Z.Socket Z.Req -> Pipe B.ByteString B.ByteString m ()
-request sock = forever $ do
-    await >>= liftIO . Z.send sock []
-    fromZMQ sock
+request sock = for cat (\b -> do
+    liftIO $ Z.send sock [] b
+    liftIO (Z.receive sock) >>= yield)
 
--- | Use a Receiver Socket to produce 'ByteString's
+{-| Wait for a msg from a receiver 'Z.Socket' and yield it
+-}
 fromZMQ :: (MonadIO m, Z.Receiver t)  => Z.Socket t -> Producer' B.ByteString m ()
 fromZMQ sock  = forever $
 	liftIO (Z.receive sock) >>= yield
