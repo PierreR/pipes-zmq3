@@ -32,11 +32,8 @@ executable sub
   main-is:  sub.hs
   build-depends:  async >= 2,
                   base >= 4,
-                  binary,
                   bytestring,
                   foldl            >= 1.0     && < 1.1,
-                  network          >= 2.2.3   && < 2.5 ,
-                  normaldistribution >= 1.1,
                   pipes            >= 4.0     && < 4.1,
                   pipes-concurrency >= 2.0    && < 2.1,
                   pipes-parse      >= 2.0.0   && < 2.1,
