@@ -20,10 +20,9 @@ Library
     Hs-Source-Dirs: src
     Build-Depends:
         base             >= 4.3     && < 5,
+        binary,
         bytestring       >= 0.10    && < 0.11,
         pipes            >= 4.0     && < 4.1,
-        pipes-bytestring >= 1.0     && < 2.0,
-        --pipes-concurrency >= 2.0     && < 2.1,
         zeromq3-haskell >= 0.5     && < 0.6
     Exposed-Modules: Pipes.ZMQ3
     GHC-Options: -O2
@@ -33,16 +32,18 @@ executable sub
   main-is:  sub.hs
   build-depends:  async >= 2,
                   base >= 4,
+                  binary,
                   bytestring,
                   foldl            >= 1.0     && < 1.1,
+                  network          >= 2.2.3   && < 2.5 ,
+                  normaldistribution >= 1.1,
                   pipes            >= 4.0     && < 4.1,
-                  pipes-bytestring >= 1.0     && < 2.0,
-                  --pipes-concurrency >= 2.0     && < 2.1,
+                  pipes-concurrency >= 2.0    && < 2.1,
                   pipes-parse      >= 2.0.0   && < 2.1,
+                  pipes-safe       >= 2.0.0   && < 2.1,
                   pipes-zmq3       >= 1.0     && < 2.0,
                   transformers,
                   random,
-                  utf8-string,
                   zeromq3-haskell  >= 0.5
 
-  ghc-options:     -Wall -threaded
+  ghc-options:     -Wall -fno-warn-unused-do-bind

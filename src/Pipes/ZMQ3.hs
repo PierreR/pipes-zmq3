@@ -1,5 +1,8 @@
-module Pipes.ZMQ3
-where
+{-# LANGUAGE RankNTypes #-}
+
+module Pipes.ZMQ3 (
+	fromZMQ
+    ) where
 
 import qualified Data.ByteString as B
 
@@ -15,9 +18,9 @@ import Control.Monad (forever)
 request :: MonadIO m => Z.Socket Z.Req -> Pipe B.ByteString B.ByteString m ()
 request sock = forever $ do
     await >>= liftIO . Z.send sock []
-    (liftIO $ Z.receive sock) >>= yield
+    fromZMQ sock
 
--- | Use a Subscription Socket to produce 'ByteString's
-fromSub :: MonadIO m => Z.Socket Z.Sub -> Producer B.ByteString m ()
-fromSub sock  = forever $ do
-	(liftIO $ Z.receive sock) >>= yield
+-- | Use a Receiver Socket to produce 'ByteString's
+fromZMQ :: (MonadIO m, Z.Receiver t)  => Z.Socket t -> Producer' B.ByteString m ()
+fromZMQ sock  = forever $
+	liftIO (Z.receive sock) >>= yield

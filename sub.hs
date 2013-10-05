@@ -59,7 +59,7 @@ main = do
             evalStateT reporter (processedData subSocket)
     where 
 
-        reporter :: StateT (Producer (Int, Int, Int) IO  r) IO ()
+        reporter :: StateT (Producer (Int, Int, Int) IO ()) IO ()
         reporter = loop
             where 
                 loop = do
@@ -79,7 +79,7 @@ main = do
             in  (,) <$> avgTemp <*> avgHumidity
 
         processedData :: Z.Socket Z.Sub -> Producer (Int, Int, Int) IO ()
-        processedData subSocket = for (PZ.fromSub subSocket) $ \bs -> do
+        processedData subSocket = for (PZ.fromZMQ subSocket) $ \bs -> do
             let [zipcode, temperature, humidity] = map read $ words (unpack bs)
             liftIO $ printf "At NY City (%d), temperature of %d and humidity %d\n"  zipcode temperature humidity          
             yield (zipcode, temperature, humidity)
