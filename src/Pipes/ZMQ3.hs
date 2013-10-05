@@ -17,8 +17,8 @@ import Control.Monad (forever)
 -}
 request :: MonadIO m => Z.Socket Z.Req -> Pipe B.ByteString B.ByteString m ()
 request sock = for cat (\b -> do
-    liftIO $ Z.send sock [] b
-    liftIO (Z.receive sock) >>= yield)
+    rep <- liftIO (Z.send sock [] b >> Z.receive sock)
+    yield rep)
 
 {-| Wait for a msg from a receiver 'Z.Socket' and yield it
 -}

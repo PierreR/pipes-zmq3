@@ -43,9 +43,9 @@ executable sub
                   random,
                   zeromq3-haskell  >= 0.5
 
-executable playground
+executable echo
   default-language: Haskell2010
-  main-is:  playground.hs
+  main-is:  echo.hs
   build-depends:  async >= 2,
                   base >= 4,
                   bytestring,
