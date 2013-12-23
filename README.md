@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/PierreR/pipes-zmq.png)](https://travis-ci.org/PierreR/pipes-zmq3)
+[![Build Status](https://travis-ci.org/PierreR/pipes-zmq3.png)](https://travis-ci.org/PierreR/pipes-zmq3)
 
 ### Description
 
