@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/PierreR/pipes-zmq.png)](https://travis-ci.org/PierreR/pipes-zmq3)
+
 ### Description
 
 This module is meant to serve as a short and easy-to-run pipes examples.
