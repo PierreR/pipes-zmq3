@@ -1,4 +1,5 @@
 before_install: sudo apt-get install libzmq3-dev
+cache: apt
 language: haskell
 script: 
     - cabal configure && cabal build
